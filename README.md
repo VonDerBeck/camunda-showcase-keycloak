@@ -2,9 +2,15 @@
 
 ## What it does
 
-This is a basic showcase for a Camunda Spring Boot application using a Keycloak Identity Provider Plugin. It consists of a simple process including a User Task as well as a Service Task
+This is a basic showcase for a Camunda Spring Boot application using a Keycloak Identity Provider Plugin. It consists of a simple process including a User Task as well as a Service Task.
 
-![process](docs/process.PNG) 
+You will not only login using Keycloak (or if configured using your preferred social identity provider)
+
+![Keycloak-Login](docs/Keycloak-Login.PNG) 
+
+but most importantly get Users and Groups in Camunda managed by Keycloak as well
+
+![Keycloak-Groups](docs/Keycloak-Groups.PNG) 
 
 ## Prerequisites
 
