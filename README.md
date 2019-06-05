@@ -76,6 +76,8 @@ The only thing you have to adapt is the **Redirect URI** of the Camuna Identity 
 
 ![Keycloak-RedirectURI](docs/Keycloak-RedirectURI.PNG) 
 
+**Beware**: This is a first basic test setup which currently still uses the Master realm. For production I would strongly encourage you to setup your own realm and use Master only for administration purposes. In a future version this showcase will be modified as well.
+
 For further details on how to setup a Keycloak Camunda Identity Service Client see documentation of [Keycloak Identity Provider Plugin](https://github.com/VonDerBeck/camunda-identity-keycloak) 
 
 ### Keycloak Identity Provider Plugin
