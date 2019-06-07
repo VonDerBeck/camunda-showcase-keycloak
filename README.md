@@ -2,7 +2,7 @@
 
 ## What it does
 
-This is a basic showcase for a Camunda Spring Boot application using a [Keycloak Identity Provider Plugin](https://github.com/VonDerBeck/camunda-identity-keycloak).
+This is a basic showcase for a Camunda Spring Boot application using the [Keycloak Identity Provider Plugin](https://github.com/VonDerBeck/camunda-identity-keycloak).
 
 You will not only login using Keycloak (or if configured using your preferred social identity provider)
 
@@ -122,6 +122,87 @@ The main configuration part in ``applicaton.yaml`` is as follows:
 	    resource:
 	      userInfoUri: ${keycloak.url.client}/auth/realms/master/protocol/openid-connect/userinfo
 
-### Kubernetes Setup
+## Kubernetes Setup
 
-TODO
+Finally - a quick introduction on how to setup Keycloak and this showcase on Kubernetes.
+
+### Multi-Stage Docker Build
+
+The Dockerfile is using a multi-stage docker build starting with a maven docker image. Why do we do that? Because we do not want to deal with maven and java versions etc. within our pipeline. In our case the pipeline will have to deal with docker, that's all.
+
+In order to make the maven build work you have to adapt the ``pom.xml`` to your own environment:
+
+		<repository>
+			<id>vonderbeck-artifactory</id>
+			<url>https://vonderbeck-artifactory.appspot.com/</url>
+		</repository>
+
+Replace this with your own maven-repo. This should be the maven repo where the required plugin artifact ``de.vonderbeck.bpm.identity:camunda-identity-keycloak`` is available. In order to make the pipeline work adapt the file ``settings-docker.xml`` accordingly:
+
+    <!-- Maven Settings for Docker Build -->
+    <servers>
+		<server>
+			<id>vonderbeck-artifactory</id>
+			<username>xxxxxx</username>
+			<password>xxxxxx</password>
+		</server>
+    </servers>
+
+Just run a standard docker image build to get your docker container.
+
+### Java module dependencies & jlinked java 11
+
+The Dockerfile includes stages for building a shrinked JDK 11 using Java's ``jlink``. Keep in mind that this is optional.
+
+Just for the records - how to find out java module dependencies and shrink your JDK:
+* Extract ``target/camunda-showcase-keycloak.jar/BOOT-INF/lib`` to `target/lib``
+* Open a shell in ``target`` and run ``jdeps -cp lib/* -R --multi-release 11 --print-module-deps --ignore-missing-deps camunda-showcase-keycloak.jar``
+
+The result goes to the jlink ``add-modules`` option in the following Dockerfile section (which has already been applied for this showcase):
+
+	# jlinked java 11 (do NOT use alpine-slim here which has important module files deleted)
+	FROM adoptopenjdk/openjdk11:jdk-11.0.3_7-alpine AS JLINKED_JAVA
+	RUN ["jlink", "--compress=2", \
+	     "--module-path", "/opt/java/openjdk/jmods", \
+	     "--add-modules", "java.base,java.compiler,java.desktop,java.instrument,java.management,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql.rowset,jdk.httpserver,jdk.jdi,jdk.unsupported", \
+	     "--output", "/jlinked"]
+
+The final result will be a slim custom JDK which has been reduced in image size. Feel free to skip this part, delete the corresponding Dockerfile sections and use a full JDK 11 as base image for your Spring Boot Application.
+
+### Kubernetes
+
+The Kubernetes setup can be found in directory ``k8s``. It contains a subfolder ``keycloak`` setting up the Keycloak test server.
+
+**Keycloak Kubernetes Setup**
+
+In order to make Keycloak run with Kubernetes you have to be aware of two things:
+* Activate the ``PROXY_ADDRESS_FORWARDING`` option for Keycloak.
+* Activate ``nginx.ingress.kubernetes.io/ssl-redirect`` in your ingress service.
+* The Redirect URI within Keycloak's Camunda-Identity-Service Client should be ``/camunda/login/*``.
+
+Keep in mind that the included ``keycloak/deployment.yaml`` is only a test setup. Adapt to your own needs. For production I would strongly encourage you to setup your own realm and use Master only for administration purposes.
+
+After setting up your Keycloak server you can start the deployment of the showcase.
+
+**Camunda Showcase Kubernetes Setup**
+
+In order to make the Camunda Showcase work the following points are noteworthy:
+* You have to activate sticky sessions within the ingress service. We have more than one pod running the showcase!
+* Keep in mind, that sticky sessions won't work without a host setting (important for a local test setup) and it is recommended to add a ``session-cookie-path`` (I have seen error reports on that - might be fixed, might be not fixed meanwhile).
+
+You should work through the following points:
+* Within the ``deployment.yaml`` of the showcase adapt the image name to your own needs.
+* Within the ``deployment.yaml`` of the showcase adapt the environment variable ``KEYCLOAK_URL_CLIENT`` to your own host
+* Within the ``ingress-service.yaml`` adapt the host name to your own environment.
+
+### SSL
+
+Since this is just a quick start, I didn't use a full SSL setup including the installation of my own certificates. Sadly the OAuth2 security part of Spring Boot has no option to deactivate SSL certificate validation, which would make a quick test setup much easier. For production keep in mind to use SSL certificates and HTTPS, especially for the login part.
+
+------------------------------------------------------------
+
+That's it. Have a happy Camunda Keycloak experience and focus on what really matters: the core processes of your customer.
+
+Brought to you by:
+
+[Gunnar von der Beck](https://www.xing.com/profile/Gunnar_vonderBeck/portfolio "XING Profile")

@@ -6,7 +6,7 @@
 
 	<groupId>de.vonderbeck.bpm.showcase</groupId>
 	<artifactId>camunda-showcase-keycloak</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 
 	<name>Camunda Spring Boot Keycloak Showcase</name>
 	<description>Showcase for using Camunda Keycloak Identity Provider </description>
