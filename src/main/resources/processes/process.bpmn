@@ -14,7 +14,7 @@
       <bpmn:outgoing>SequenceFlow_18o7zqy</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_1f6ewxt" sourceRef="ApproveUser" targetRef="ExclusiveGateway_05yeyo5" />
-    <bpmn:userTask id="ApproveUser" name="Approve user" camunda:formKey="embedded:app:/camunda/forms/task-form.html">
+    <bpmn:userTask id="ApproveUser" name="Approve user" camunda:formKey="embedded:app:camunda/forms/task-form.html">
       <bpmn:incoming>SequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1f6ewxt</bpmn:outgoing>
     </bpmn:userTask>
