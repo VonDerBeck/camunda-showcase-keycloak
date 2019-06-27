@@ -126,6 +126,11 @@ The main configuration part in ``applicaton.yaml`` is as follows:
 
 Finally - a quick introduction on how to setup Keycloak and this showcase on Kubernetes.
 
+![KubernetesSetup](docs/KubernetesSetup.PNG)
+
+
+Before we turn to Kubernetes it is necessary to shortly introduce the Docker Build process.
+
 ### Multi-Stage Docker Build
 
 The Dockerfile is using a multi-stage docker build starting with a maven docker image. Why do we do that? Because we do not want to deal with maven and java versions etc. within our pipeline. In our case the pipeline will have to deal with docker, that's all.
