@@ -1,5 +1,11 @@
 # Camunda Showcase for Spring Boot & Keycloak Identity Provider
 
+Important notice: this <span style="color:red">**repository has moved**</span> to
+
+<https://github.com/camunda/camunda-bpm-identity-keycloak/tree/master/examples/sso-kubernetes>
+
+*Please use the new URL. This repository is not up-to-date and will not be maintained any longer.*
+
 ## What it does
 
 This is a basic showcase for a Camunda Spring Boot application using the [Keycloak Identity Provider Plugin](https://github.com/VonDerBeck/camunda-identity-keycloak).
